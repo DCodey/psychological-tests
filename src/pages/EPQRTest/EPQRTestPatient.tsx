@@ -23,10 +23,7 @@ const EPQRTestPatient = ({
       <div className="max-w-md mx-auto p-6 bg-white rounded-xl shadow-md text-center">
         <div className="mb-6">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-gray-800 mb-2">¡Test Completado!</h2>
-          <p className="text-gray-600">
-            Gracias por completar el test. Los resultados han sido enviados a tu psicólogo.
-          </p>
+          <h2 className="text-xl font-bold text-gray-800 mb-2">¡Test Completado!</h2>          
         </div>
         <button
           onClick={() => window.close()}

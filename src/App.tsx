@@ -6,14 +6,22 @@ import SecurePsychologistCreate from './pages/EPQRTest/SecurePsychologistCreate'
 import SecurePatientTest from './pages/EPQRTest/SecurePatientTest';
 import SecureResultView from './pages/EPQRTest/SecureResultView';
 import PsychologistDashboard from './pages/EPQRTest/PsychologistDashboard';
+import About from './pages/About/About';
+import TestsPage from './pages/Tests/Tests';
 
 function App() {
   return (
     <Router>
       <div className="min-h-screen flex flex-col bg-gray-50">
         <Routes>
-          {/* Ruta principal para el psicólogo */}
+          {/* Ruta principal */}
           <Route path="/" element={<Home />} />
+          
+          {/* Ruta Acerca de */}
+          <Route path="/acerca-de" element={<About />} />
+          
+          {/* Ruta para ver las pruebas generadas */}
+          <Route path="/pruebas" element={<TestsPage />} />
           
           {/* Ruta para el dashboard del psicólogo */}
           <Route path="/psychologist" element={<PsychologistDashboard />} />

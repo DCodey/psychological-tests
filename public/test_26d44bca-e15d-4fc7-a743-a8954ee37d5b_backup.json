@@ -1,0 +1,13 @@
+{
+  "patientData": {
+    "fullName": "aaa",
+    "age": 11,
+    "secretKey": "casa",
+    "testType": "EPQR",
+    "createdAt": "2025-09-16T06:36:07.183Z"
+  },
+  "testType": "EPQR",
+  "createdAt": "2025-09-16T06:36:07.183Z",
+  "status": "pending",
+  "testUrl": "http://localhost:5173/test/26d44bca-e15d-4fc7-a743-a8954ee37d5b?data=eyJzYWx0IjoiYTAzNWU2NDEyZGUzMDlkYTZhYjFlMDU3Y2RhMTc0ZmNmMDIwY2Q0Njg4ODcxMTQ5NWVlMzIwMTg1ODVmMzJlNyIsIml2IjoiODUxN2M5NDkxMTAxNGQzYzc1ZDU4NDQ3YzU2MWQ1ZTUiLCJjaXBoZXJ0ZXh0IjoiVTJGc2RHVmtYMTg4TFROSlQ4QUNMelVNQlpRelRJbWpvc05ZVkJCVUhuU3BhanlLeE9tTm5ibTlENU5iT1pPZXczSWxIK0VZb3V5M2YyMmVKZUU0b1VxRHFQWGtrTm05SHZLMHdkRmlvZSthTmIwNkFETHp2SnFEZVJHdzcrV0xBa2JlcnVVNlE5a0pmVEJQbVh1LzRDNS8ySFpGQnAxYm95YkdadjJ3VzhIYzlpZ0JZWkNVaUZ1a3crd09pSWYxcUhQTUViRTcvNFZRL29XbXgzVVhVQlU2bjhaWStYdGJSa0VmN2RnUTBGK1VlVGxiRE1XQlZVT3dlK0J6R0gwQzdRdzNSdk8wazY0bE4rU0dZSW5MVWRlMDh0di9pRTgxc3BCak1Jc2F2L0k9In0%3D"
+}

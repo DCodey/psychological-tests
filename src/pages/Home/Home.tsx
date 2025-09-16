@@ -5,6 +5,7 @@ import type { Test } from '../../types/test.types';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 import TestList from '../../components/TestList/TestList';
+import PageLayout from '../../layouts/PageLayout';
 
 interface PatientFormData {
   fullName: string;
@@ -38,12 +39,12 @@ const Home: React.FC = () => {
   const [shareLink, setShareLink] = useState('');
   const [showPatientForm, setShowPatientForm] = useState(false);
   const [currentTestId, setCurrentTestId] = useState<string | null>(null);
-  const [patientData, setPatientData] = useState<PatientFormData>({ 
-    fullName: '', 
+  const [patientData, setPatientData] = useState<PatientFormData>({
+    fullName: '',
     age: '',
     secretKey: 'clave-secreta-123' // Valor por defecto
   });
-  
+
   const [tests] = useState<Test[]>([
     {
       id: '1',
@@ -95,7 +96,7 @@ const Home: React.FC = () => {
   const handlePatientDataSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentTestId) return;
-    
+
     // Obtener la configuración del test actual
     const currentTest = tests.find((test: Test) => test.id === currentTestId);
     if (!currentTest) {
@@ -104,7 +105,7 @@ const Home: React.FC = () => {
     }
 
     const testId = generateTestId();
-    
+
     // Crear objeto con los datos del paciente
     const patientInfo = {
       name: patientData.fullName,
@@ -113,14 +114,14 @@ const Home: React.FC = () => {
       timestamp: Date.now(),
       testType: currentTestId
     };
-    
+
     try {
       // Cifrar los datos del paciente
       const encryptedData = encryptData(patientInfo, patientData.secretKey);
-      
+
       // Generar URL para el paciente
       const patientLink = `${window.location.origin}${currentTest.url}?data=${encodeURIComponent(encryptedData)}`;
-      
+
       // Guardar los datos en localStorage para referencia del psicólogo
       const savedTests = JSON.parse(localStorage.getItem('psychologistTests') || '{}');
       savedTests[testId] = {
@@ -132,19 +133,19 @@ const Home: React.FC = () => {
         status: 'pending'
       };
       localStorage.setItem('psychologistTests', JSON.stringify(savedTests));
-      
+
       // Actualizar el estado
       setShareLink(patientLink);
       setShowPatientForm(false);
       setShowShareModal(true);
-      
+
       // Reset form
-      setPatientData({ 
-        fullName: '', 
+      setPatientData({
+        fullName: '',
         age: '',
         secretKey: 'clave-secreta-123' // Mantener el valor por defecto
       });
-      
+
     } catch (error) {
       console.error('Error al procesar los datos del paciente:', error);
       alert('Ocurrió un error al generar el enlace de la prueba. Por favor, intente nuevamente.');
@@ -165,147 +166,17 @@ const Home: React.FC = () => {
 
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <Header 
-        title="Catálogo de Pruebas Psicológicas"
-      />
-      
-      <main className="container mx-auto px-4 py-8 md:py-12">       
-        <TestList 
-          tests={tests} 
-          onStartTest={handleStartTest} 
-        />
-      </main>
-      
-      <Footer />
-
-      {/* Modal de formulario de paciente */}
-      {showPatientForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-bold text-gray-800">Datos del Paciente</h2>
-                <button 
-                  onClick={() => setShowPatientForm(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              
-              <form onSubmit={handlePatientDataSubmit} className="space-y-4">
-                <div>
-                  <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
-                    Nombre completo del paciente
-                  </label>
-                  <input
-                    type="text"
-                    id="fullName"
-                    name="fullName"
-                    value={patientData.fullName}
-                    onChange={handlePatientDataChange}
-                    placeholder="Ej: Juan Pérez"
-                    className="w-full border border-gray-300 rounded-lg py-2 px-4 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label htmlFor="age" className="block text-sm font-medium text-gray-700 mb-1">
-                    Edad del paciente
-                  </label>
-                  <input
-                    type="number"
-                    id="age"
-                    name="age"
-                    min="1"
-                    max="120"
-                    value={patientData.age}
-                    onChange={handlePatientDataChange}
-                    placeholder="Ej: 28"
-                    className="w-full border border-gray-300 rounded-lg py-2 px-4 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    required
-                  />
-                </div>
-                
-                <div>
-                  <label htmlFor="secretKey" className="block text-sm font-medium text-gray-700 mb-1">
-                    Clave secreta
-                  </label>
-                  <input
-                    type="text"
-                    id="secretKey"
-                    name="secretKey"
-                    value={patientData.secretKey}
-                    onChange={handlePatientDataChange}
-                    placeholder="Ingrese la clave secreta"
-                    className="w-full border border-gray-300 rounded-lg py-2 px-4 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-                    required
-                  />
-                  <p className="mt-1 text-xs text-gray-500">Esta clave se usará para cifrar los resultados del test.</p>
-                </div>
-                
-                <div className="pt-2">
-                  <button
-                    type="submit"
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg shadow-sm transition-colors duration-200"
-                  >
-                    Generar enlace del test
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
+    <>
+    <PageLayout>
+        <div className="container mx-auto px-4 py-8 pb-20 md:py-12">
+          <TestList
+            tests={tests}
+            onStartTest={handleStartTest}
+          />
         </div>
-      )}
 
-      {/* Modal para compartir enlace */}
-      {showShareModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Compartir prueba con el paciente</h3>
-              <button 
-                onClick={() => setShowShareModal(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            <p className="text-gray-600 mb-4">Copia el siguiente enlace y compártelo con tu paciente:</p>
-            <div className="flex items-center space-x-2">
-              <input
-                type="text"
-                readOnly
-                value={shareLink}
-                className="flex-1 border border-gray-300 rounded-l-lg py-2 px-4 text-sm truncate"
-              />
-              <button
-                type="button"
-                onClick={handleCopyShareLink}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-r-lg transition-colors duration-200 disabled:opacity-50"
-                disabled={copyStatus === 'copied'}
-              >
-                {copyStatus === 'copied' ? '¡Copiado!' : 'Copiar'}
-              </button>
-            </div>
-            <div className="flex justify-end">
-              <button 
-                onClick={() => setShowShareModal(false)}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800"
-              >
-                Cerrar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
+      </PageLayout>
+      </>
   );
 };
 

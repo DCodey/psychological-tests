@@ -16,9 +16,9 @@ const TestList: React.FC<TestListProps> = ({ tests, onStartTest, onNavigateTest 
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
-      <div className="mb-8 text-center">
-        <h2 className="text-2xl font-semibold text-gray-800 mb-2">Nuestras Pruebas</h2>
+    <div className="h-screen max-w-7xl mx-auto">
+      <div className="hidden md:block mb-8 text-center">
+        <h2 className="md:text-2xl font-semibold text-gray-800 mb-2">Nuestras Pruebas</h2>
         <p className="text-gray-600 max-w-2xl mx-auto">
           Evaluaciones validadas científicamente para un análisis psicológico preciso.
         </p>
