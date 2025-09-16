@@ -30,20 +30,6 @@ export const getInterpretation = (scale: keyof EPQRScaleInterpretation, score: n
         description: 'Persona ansiosa, preocupada y con cambios de humor frecuentes.'
       }
     },
-    P: {
-      bajo: {
-        level: 'bajo',
-        description: 'Persona empática, cooperativa y con buen autocontrol.'
-      },
-      medio: {
-        level: 'medio',
-        description: 'Equilibrio en rasgos de psicoticismo.'
-      },
-      alto: {
-        level: 'alto',
-        description: 'Persona fría, agresiva, impulsiva y con poca empatía.'
-      }
-    },
     L: {
       bajo: {
         level: 'bajo',
@@ -65,10 +51,6 @@ export const getInterpretation = (scale: keyof EPQRScaleInterpretation, score: n
   if (scale === 'E' || scale === 'N') {
     if (score <= 5) level = 'bajo';
     else if (score <= 15) level = 'medio';
-    else level = 'alto';
-  } else if (scale === 'P') {
-    if (score <= 3) level = 'bajo';
-    else if (score <= 7) level = 'medio';
     else level = 'alto';
   } else if (scale === 'L') {
     if (score <= 2) level = 'bajo';

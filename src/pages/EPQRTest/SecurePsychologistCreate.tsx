@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { encryptData } from '../../utils/crypto';
-import { Copy, Download, CheckCircle } from 'lucide-react';
+import { Copy, CheckCircle } from 'lucide-react';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
 
@@ -11,7 +11,6 @@ export default function SecurePsychologistCreate() {
     age: '',
     secretKey: ''
   });
-  const [testToken, setTestToken] = useState<string>('');
   const [testUrl, setTestUrl] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>('idle');
@@ -63,7 +62,6 @@ export default function SecurePsychologistCreate() {
 
       localStorage.setItem(`test_${token}`, JSON.stringify(testWithUrl));
 
-      setTestToken(token);
       setTestUrl(testUrl);
       setShowSuccess(true);
       setFormData({ fullName: '', age: '', secretKey: '' });
@@ -85,26 +83,6 @@ export default function SecurePsychologistCreate() {
       setCopyStatus('error');
       setTimeout(() => setCopyStatus('idle'), 2000);
     }
-  };
-
-  const downloadTestInfo = () => {
-    const testInfo = {
-      token: testToken,
-      patientName: formData.fullName,
-      secretKey: formData.secretKey,
-      createdAt: new Date().toISOString(),
-      url: testUrl
-    };
-
-    const blob = new Blob([JSON.stringify(testInfo, null, 2)], {
-      type: 'application/json'
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `test_info_${testToken}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
   };
 
   if (showSuccess) {

@@ -227,10 +227,6 @@ export function EPQRResultView() {
       if (score <= 5) return 'Baja';
       if (score <= 15) return 'Media';
       return 'Alta';
-    } else if (scale === 'P') {
-      if (score <= 3) return 'Baja';
-      if (score <= 7) return 'Media';
-      return 'Alta';
     } else { // L
       if (score <= 2) return 'Baja';
       if (score <= 5) return 'Media';
@@ -243,7 +239,6 @@ export function EPQRResultView() {
     switch (scale) {
       case 'E': return 'Extraversión';
       case 'N': return 'Neuroticismo';
-      case 'P': return 'Psicoticismo';
       case 'L': return 'Escala de Mentira';
       default: return scale;
     }
@@ -257,7 +252,7 @@ export function EPQRResultView() {
         <p className="text-gray-600 mb-6">Fecha de realización: {new Date(result.date).toLocaleDateString()}</p>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          {result && (['E', 'N', 'P', 'L'] as const).map((scale) => (
+          {result && (['E', 'N', 'L'] as const).map((scale) => (
             <div key={scale} className="bg-gray-50 p-4 rounded-lg">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">
                 {getScaleName(scale)}

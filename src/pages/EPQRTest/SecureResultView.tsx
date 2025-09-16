@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { decryptData, verifyHash } from '../../utils/crypto';
-import { CheckCircle, AlertCircle, Eye, EyeOff } from 'lucide-react';
+import { AlertCircle, Eye, EyeOff } from 'lucide-react';
+import TemperamentChart from '../../components/TemperamentChart/TemperamentChart';
+import { determineTemperament, TEMPERAMENT_TYPES } from '../../types/temperament.types';
 
 interface PatientData {
   fullName: string;
@@ -28,8 +30,10 @@ interface TestResults {
 }
 
 export default function SecureResultView() {
+  // Hooks deben ir siempre al principio del componente
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
+  const reportRef = useRef<HTMLDivElement>(null);
   
   const [testData, setTestData] = useState<TestData | null>(null);
   const [patientData, setPatientData] = useState<PatientData | null>(null);
@@ -39,7 +43,7 @@ export default function SecureResultView() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>('');
   const [showSecretKey, setShowSecretKey] = useState(false);
-  const [scores, setScores] = useState<{ E: number; N: number; P: number; L: number } | null>(null);
+  const [scores, setScores] = useState<{ E: number; N: number; L: number } | null>(null);
 
   useEffect(() => {
     if (!token) {
@@ -116,7 +120,7 @@ export default function SecureResultView() {
       setTestResults(testResults);
       
       // Calcular puntuaciones del EPQR
-      calculateScores(testResults.responses);
+      await calculateScores(testResults.responses);
 
       setShowKeyInput(false);
       
@@ -128,12 +132,13 @@ export default function SecureResultView() {
     }
   };
 
-  const calculateScores = (responses: boolean[]) => {
-    const scores = { E: 0, N: 0, P: 0, L: 0 };
-    
-    // Importar las preguntas del EPQR
-    import('./epqr-questions').then(module => {
+  const calculateScores = async (responses: boolean[]) => {
+    try {
+      // Importar las preguntas del EPQR
+      const module = await import('./epqr-questions');
       const questions = module.default;
+      
+      const newScores = { E: 0, N: 0, L: 0 };
       
       responses.forEach((answer, index) => {
         const question = questions[index];
@@ -143,29 +148,28 @@ export default function SecureResultView() {
         
         switch (question.scale) {
           case 'E':
-            scores.E += points;
+            newScores.E += points;
             break;
           case 'N':
-            scores.N += points;
-            break;
-          case 'P':
-            scores.P += points;
+            newScores.N += points;
             break;
           case 'L':
-            scores.L += points;
+            newScores.L += points;
             break;
         }
       });
       
-      setScores(scores);
-    });
+      setScores(newScores);
+    } catch (error) {
+      console.error('Error al calcular puntuaciones:', error);
+      setError('Error al procesar los resultados del test');
+    }
   };
 
   const getScaleName = (scale: string) => {
     switch (scale) {
       case 'E': return 'Extraversión';
       case 'N': return 'Neuroticismo';
-      case 'P': return 'Psicoticismo';
       case 'L': return 'Escala de Mentira';
       default: return scale;
     }
@@ -176,14 +180,18 @@ export default function SecureResultView() {
       if (score <= 5) return 'Baja';
       if (score <= 15) return 'Media';
       return 'Alta';
-    } else if (scale === 'P') {
-      if (score <= 3) return 'Baja';
-      if (score <= 7) return 'Media';
-      return 'Alta';
     } else { // L
       if (score <= 2) return 'Baja';
       if (score <= 5) return 'Media';
       return 'Alta';
+    }
+  };
+
+  const calculatePercentage = (score: number, scale: string) => {
+    if (scale === 'E' || scale === 'N') {
+      return (score / 24) * 100; // 24 es el máximo para E y N
+    } else { // L
+      return (score / 7) * 100; // 7 es el máximo para L
     }
   };
 
@@ -301,16 +309,19 @@ export default function SecureResultView() {
     );
   }
 
+  // reportRef y patientName ya fueron movidos al principio del componente
+
   return (
     <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">
+      <div className="max-w-4xl mx-auto">        
+        <div id="report-content" ref={reportRef} className="bg-white md:p-6 p-4 rounded-lg shadow-md">
+          {/* Header */}
+          <div className="mb-6">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-800 mb-2">
             Resultados del Test EPQR
           </h1>
           {patientData && (
-            <div className="text-gray-600">
+            <div className="text-gray-600 text-sm md:text-base">
               <p><strong>Paciente:</strong> {patientData.fullName}</p>
               <p><strong>Edad:</strong> {patientData.age} años</p>
               <p><strong>Fecha de realización:</strong> {testResults?.completedAt ? new Date(testResults.completedAt).toLocaleDateString() : 'N/A'}</p>
@@ -321,21 +332,21 @@ export default function SecureResultView() {
         {/* Scores */}
         {scores && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Puntuaciones</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">Puntuaciones</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {Object.entries(scores).map(([scale, score]) => (
-                <div key={scale} className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                <div key={scale} className="bg-gray-50 p-3 rounded-lg">
+                  <h3 className="text-md md:text-xl font-semibold text-gray-800 mb-2">
                     {getScaleName(scale)}
                   </h3>
                   <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
                     <div 
                       className="bg-indigo-600 h-4 rounded-full" 
-                      style={{ width: `${(score / 12) * 100}%` }}
+                      style={{ width: `${calculatePercentage(score, scale)}%` }}
                     ></div>
                   </div>
                   <div className="flex justify-between text-sm text-gray-600">
-                    <span>Puntuación: {score}/12</span>
+                    <span>Puntuación: {score}/{scale === 'L' ? 7 : 24}</span>
                     <span className="font-medium">{interpretScore(score, scale)}</span>
                   </div>
                 </div>
@@ -347,12 +358,12 @@ export default function SecureResultView() {
         {/* Responses */}
         {testResults && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Respuestas Detalladas</h2>
-            <div className="space-y-2">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">Respuestas Detalladas</h2>
+            <div className="space-y-2 text-sm md:text-base overflow-y-auto h-[300px]">
               {testResults.responses.map((response, index) => (
                 <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                  <span className="text-sm text-gray-700">Pregunta {index + 1}</span>
-                  <span className={`px-2 py-1 rounded text-sm font-medium ${
+                  <span className="text-sm md:text-base text-gray-700">Pregunta {index + 1}</span>
+                  <span className={`px-2 py-1 rounded text-sm md:text-base font-medium ${
                     response ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                   }`}>
                     {response ? 'Sí' : 'No'}
@@ -363,40 +374,46 @@ export default function SecureResultView() {
           </div>
         )}
 
-        {/* Security Info */}
-        <div className="bg-green-50 border-l-4 border-green-400 p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <CheckCircle className="h-5 w-5 text-green-400" />
-            </div>
-            <div className="ml-3">
-              <p className="text-sm text-green-700">
-                <strong>Verificación de integridad:</strong> Los datos han sido verificados y no han sido modificados.
-              </p>
-            </div>
+        {/* Temperament Chart */}
+        {scores && (
+          <div className="mb-6">
+            <TemperamentChart eScore={scores.E} nScore={scores.N} />
           </div>
-        </div>
+        )}
 
-        {/* Actions */}
-        <div className="mt-6 flex gap-4">
-          <button
-            onClick={() => {
-              setShowKeyInput(true);
-              setSecretKey('');
-              setPatientData(null);
-              setTestResults(null);
-              setScores(null);
-            }}
-            className="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg"
-          >
-            Cerrar Sesión
-          </button>
-          <button
-            onClick={() => navigate('/')}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg"
-          >
-            Ver Otros Tests
-          </button>
+        {/* Temperament Analysis */}
+        {scores && (
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4">Análisis de Temperamento</h2>
+            {(() => {
+              const temperamentKey = determineTemperament(scores.E, scores.N);
+              const temperament = TEMPERAMENT_TYPES[temperamentKey];
+              
+              return (
+                <>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                    {temperament.name}
+                  </h3>
+                  <p className="text-gray-700 mb-4">{temperament.description}</p>
+                  
+                  <h4 className="font-semibold text-gray-800 mt-4 mb-2">Características:</h4>
+                  <ul className="list-disc pl-5 text-gray-700 mb-4">
+                    {temperament.characteristics.map((char, index) => (
+                      <li key={index}>{char}</li>
+                    ))}
+                  </ul>
+                  
+                  <h4 className="font-semibold text-gray-800 mt-4 mb-2">Recomendaciones:</h4>
+                  <ul className="list-disc pl-5 text-gray-700">
+                    {temperament.recommendations.map((rec, index) => (
+                      <li key={index}>{rec}</li>
+                    ))}
+                  </ul>
+                </>
+              );
+            })()}
+          </div>
+        )}
         </div>
       </div>
     </div>

@@ -45,11 +45,6 @@ const EPQRTestPsychologist = ({ result, decryptedData }: EPQRTestPsychologistPro
                 <p className="text-2xl font-bold text-purple-800">{result.N}</p>
                 <p className="text-xs text-purple-600 mt-1">Alta: {result.N > 14 ? 'Sí' : 'No'}</p>
               </div>
-              <div className="bg-green-50 p-4 rounded-lg text-center">
-                <p className="text-sm text-green-700 font-medium">Psicoticismo (P)</p>
-                <p className="text-2xl font-bold text-green-800">{result.P}</p>
-                <p className="text-xs text-green-600 mt-1">Alta: {result.P > 8 ? 'Sí' : 'No'}</p>
-              </div>
               <div className="bg-yellow-50 p-4 rounded-lg text-center">
                 <p className="text-sm text-yellow-700 font-medium">Mentira (L)</p>
                 <p className="text-2xl font-bold text-yellow-800">{result.L}</p>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, Download, Trash2, Calendar, User, RefreshCw } from 'lucide-react';
+import { Download, Trash2, User, RefreshCw } from 'lucide-react';
 import { useTestSync } from './TestSyncManager';
 import PageLayout from '../../layouts/PageLayout';
 import { toast, Toaster } from 'react-hot-toast';
@@ -358,10 +358,6 @@ export default function PsychologistDashboard() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleViewResults = (token: string) => {
-    navigate(`/result/${token}`);
   };
 
   const handleDeleteTest = (token: string) => {

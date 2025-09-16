@@ -85,7 +85,6 @@ const EPQRTest: React.FC<EPQRTestProps> = ({ mode = 'patient' }) => {
     const result: Omit<EPQRResult, 'id' | 'patientId' | 'patientData'> = {
       E: 0,
       N: 0,
-      P: 0,
       L: 0,
       date: new Date().toISOString(),
       answers
@@ -96,7 +95,6 @@ const EPQRTest: React.FC<EPQRTestProps> = ({ mode = 'patient' }) => {
       const points = question.positive ? (answer ? 1 : 0) : (answer ? 0 : 1);
       if (question.scale === 'E') result.E += points;
       else if (question.scale === 'N') result.N += points;
-      else if (question.scale === 'P') result.P += points;
       else if (question.scale === 'L') result.L += points;
     });
     setResult(result as EPQRResult);

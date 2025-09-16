@@ -54,12 +54,10 @@ const ResultView = () => {
     // Lógica para calcular los resultados basados en las respuestas
     const eCount = responses.filter((r, i) => i < 10 && r).length;
     const nCount = responses.filter((r, i) => i >= 10 && i < 20 && r).length;
-    const pCount = responses.filter((r, i) => i >= 20 && i < 30 && r).length;
     
     return {
       E: eCount,
       N: nCount,
-      P: pCount,
       L: 0, // Valor por defecto para L (Mentira)
       id: 'temp-id',
       patientId: 'temp-patient-id',
@@ -151,12 +149,7 @@ const ResultView = () => {
               <p className="text-sm text-purple-700 font-medium">Neuroticismo (N)</p>
               <p className="text-2xl font-bold text-purple-800">{result.N}</p>
               <p className="text-xs text-purple-600 mt-1">Alta: {result.N > 14 ? 'Sí' : 'No'}</p>
-            </div>
-            <div className="bg-green-50 p-4 rounded-lg text-center">
-              <p className="text-sm text-green-700 font-medium">Psicoticismo (P)</p>
-              <p className="text-2xl font-bold text-green-800">{result.P}</p>
-              <p className="text-xs text-green-600 mt-1">Alta: {result.P > 8 ? 'Sí' : 'No'}</p>
-            </div>
+            </div>           
             <div className="bg-yellow-50 p-4 rounded-lg text-center">
               <p className="text-sm text-yellow-700 font-medium">Mentira (L)</p>
               <p className="text-2xl font-bold text-yellow-800">{result.L}</p>

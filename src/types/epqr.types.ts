@@ -20,7 +20,6 @@ export interface EPQRResult {
   patientId: string;
   E: number; // Extraversión
   N: number; // Neuroticismo
-  P: number; // Psicoticismo
   L: number; // Mentira
   date: string; // Fecha de realización del test
   testDate?: string; // Alias opcional para compatibilidad
@@ -44,14 +43,17 @@ export interface EPQRInterpretation {
   description: string;
 }
 
+export interface TotalScoreInterpretation {
+  E: number;
+  N: number;
+  L: number;
+}
+
 export interface EPQRScaleInterpretation {
   E: {
     [key: string]: EPQRInterpretation;
   };
   N: {
-    [key: string]: EPQRInterpretation;
-  };
-  P: {
     [key: string]: EPQRInterpretation;
   };
   L: {
