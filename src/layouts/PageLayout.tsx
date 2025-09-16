@@ -9,9 +9,9 @@ interface PageLayoutProps {
 
 const PageLayout: React.FC<PageLayoutProps> = ({ children, className = '' }) => {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col bg-gray-50">
       <Header />
-      <main className={`h-screen flex-grow w-full pb-32 md:pb-24 ${className}`}>
+      <main className={`flex-grow w-full pb-32 md:pb-24 ${className}`}>
         {children}
       </main>
       <Footer className="mt-auto" />
