@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { decryptData } from '../../utils/crypto';
 import type { EPQRResult } from '../../types/epqr.types';
 
 interface TestResults {

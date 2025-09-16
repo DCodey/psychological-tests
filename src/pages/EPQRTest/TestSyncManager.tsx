@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { decryptData, encryptData, generateHash } from '../../utils/crypto';
+import { useState, useEffect } from 'react';
 
 interface TestData {
   encryptedPatientData: string;

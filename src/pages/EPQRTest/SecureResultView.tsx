@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { decryptData, decryptTestResponses, generateHash, verifyHash } from '../../utils/crypto';
+import { decryptData, verifyHash } from '../../utils/crypto';
 import { CheckCircle, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 interface PatientData {
@@ -107,7 +107,7 @@ export default function SecureResultView() {
       
       // Verificar integridad de las respuestas
       if (testResults.integrityHash) {
-        const computedHash = generateHash(testResults.responses);
+        
         if (!verifyHash(testResults.responses, testResults.integrityHash)) {
           throw new Error('Los datos del test han sido modificados');
         }

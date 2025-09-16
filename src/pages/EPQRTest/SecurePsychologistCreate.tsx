@@ -1,17 +1,9 @@
 import React, { useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { encryptData, generateHash } from '../../utils/crypto';
+import { encryptData } from '../../utils/crypto';
 import { Copy, Download, CheckCircle } from 'lucide-react';
 import Header from '../../components/Header/Header';
 import Footer from '../../components/Footer/Footer';
-
-interface PatientData {
-  fullName: string;
-  age: number;
-  secretKey: string;
-  testType: string;
-  createdAt: string;
-}
 
 export default function SecurePsychologistCreate() {
   const [formData, setFormData] = useState({
@@ -46,15 +38,6 @@ export default function SecurePsychologistCreate() {
     try {
       // Generar token único para el test
       const token = uuidv4();
-      
-      // Crear datos del paciente
-      const patientData: PatientData = {
-        fullName: formData.fullName.trim(),
-        age: parseInt(formData.age),
-        secretKey: formData.secretKey.trim(),
-        testType: 'EPQR',
-        createdAt: new Date().toISOString()
-      };
 
       // Crear datos del test que incluyen la clave secreta
       const testData = {

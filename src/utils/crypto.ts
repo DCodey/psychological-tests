@@ -1,7 +1,3 @@
-// src/utils/crypto.ts
-// Sistema de cifrado seguro para tests psicológicos
-// Usa AES-256-GCM con crypto-js para compatibilidad y simplicidad
-
 import CryptoJS from 'crypto-js';
 
 // Configuración de seguridad
@@ -100,16 +96,6 @@ export function decryptData(encryptedData: string, secretKey: string): any {
     console.error('Error al descifrar datos:', error);
     throw new Error('Clave incorrecta o datos corruptos');
   }
-}
-
-/**
- * Cifra la clave secreta para almacenamiento seguro
- * (Esta función es para compatibilidad, pero no la usaremos en el flujo principal)
- */
-export function encryptSecretKey(secretKey: string): string {
-  // Para el flujo principal, la clave secreta se maneja manualmente
-  // Esta función es solo para compatibilidad con código existente
-  return CryptoJS.AES.encrypt(secretKey, 'temp-key').toString();
 }
 
 /**

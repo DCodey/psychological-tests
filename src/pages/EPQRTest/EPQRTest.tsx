@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { encryptData, encryptSecretKey, decryptData, decryptSecretKey } from '../../utils/crypto';
+import { decryptData } from '../../utils/crypto';
 import type { EPQRResult } from '../../types/epqr.types';
 import type { TestMode } from '../../types/test.types';
 import questions from './epqr-questions';
@@ -33,8 +33,6 @@ const EPQRTest: React.FC<EPQRTestProps> = ({ mode = 'patient' }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [testStage, setTestStage] = useState<'test' | 'results' | 'share' | 'secretKey'>('test');
-  const [testLink] = useState('');
-  const [, setShareLink] = useState('');
   const [result, setResult] = useState<EPQRResult | null>(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -83,20 +81,6 @@ const EPQRTest: React.FC<EPQRTestProps> = ({ mode = 'patient' }) => {
     setAnswers(Array(questions.length).fill(false));
   }, []);
 
-  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>('idle');
-
-  const copyToClipboard = async () => {
-    if (!testLink) return;
-    try {
-      await navigator.clipboard.writeText(testLink);
-      setCopyStatus('copied');
-      setTimeout(() => setCopyStatus('idle'), 2000);
-    } catch (err) {
-      setCopyStatus('error');
-      setTimeout(() => setCopyStatus('idle'), 2000);
-    }
-  };
-
   const calculateResults = (answers: boolean[]) => {
     const result: Omit<EPQRResult, 'id' | 'patientId' | 'patientData'> = {
       E: 0,
@@ -134,7 +118,6 @@ const EPQRTest: React.FC<EPQRTestProps> = ({ mode = 'patient' }) => {
     }
   };
 
-
   if (isPsychologist && !patientData.fullName) {
     navigate('/');
     return null;
@@ -157,7 +140,7 @@ const EPQRTest: React.FC<EPQRTestProps> = ({ mode = 'patient' }) => {
       }
 
       // Verificar que los datos descifrados tengan la estructura esperada
-      const { name, age, secretKey, timestamp } = decrypted;
+      const { name, age, secretKey } = decrypted;
       
       if (!name || !age || !secretKey) {
         throw new Error('Datos descifrados inválidos');
@@ -191,18 +174,6 @@ const EPQRTest: React.FC<EPQRTestProps> = ({ mode = 'patient' }) => {
           throw new Error('No se pudieron obtener los datos del paciente');
         }
 
-        // Crear objeto con las respuestas y datos del paciente
-        const testResults = {
-          responses: newAnswers,
-          patientName: patientInfo.name,
-          patientAge: patientInfo.age,
-          testCompletedAt: new Date().toISOString(),
-          secretKey: patientInfo.secretKey, // Incluir la clave secreta en los resultados
-          testType: 'EPQR'
-        };
-
-        // Cifrar los resultados con la clave secreta
-        const encryptedResults = encryptData(testResults, patientInfo.secretKey);
         const resultId = generateId();
         
         // Guardar los resultados en localStorage (opcional, para referencia local)
@@ -213,13 +184,8 @@ const EPQRTest: React.FC<EPQRTestProps> = ({ mode = 'patient' }) => {
           completedAt: new Date().toISOString(),
           status: 'completed'
         };
-        localStorage.setItem('epqrTests', JSON.stringify(tests));
-        
-        // Generar URL de resultados (incluye las respuestas cifradas)
-        const resultLink = `${window.location.origin}/result?data=${encodeURIComponent(encryptedResults)}`;
-        setTestLink(resultLink);
-        setShareLink(resultLink);
-        
+        localStorage.setItem('epqrTests', JSON.stringify(tests));        
+     
         // Mostrar resultados al paciente
         calculateResults(newAnswers);
         setTestStage('share');

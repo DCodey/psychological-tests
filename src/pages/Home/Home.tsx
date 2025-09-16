@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { v4 as uuidv4 } from 'uuid';
 import { encryptData } from '../../utils/crypto';
 import type { Test } from '../../types/test.types';
 import Header from '../../components/Header/Header';
@@ -15,57 +14,7 @@ interface PatientFormData {
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const [mode, setMode] = useState<'patient' | 'psychologist'>('patient');
-  const [formData, setFormData] = useState<PatientFormData>({
-    fullName: '',
-    age: '',
-    secretKey: uuidv4(), // Generar una clave secreta única por defecto
-  });
   const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>('idle');
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: name === 'age' ? value.replace(/\D/g, '') : value,
-    }));
-  };
-
-  const generateTestLink = () => {
-    try {
-      const testId = uuidv4();
-      const testData = {
-        patientName: formData.fullName,
-        patientAge: formData.age,
-        testId,
-        timestamp: new Date().toISOString(),
-        secretKey: formData.secretKey // Incluimos la clave secreta en los datos cifrados
-      };
-
-      // Cifrar todos los datos del paciente incluyendo la clave secreta
-      const encryptedData = encryptData(testData, formData.secretKey);
-      
-      // Crear la URL con los datos cifrados
-      const testUrl = new URL(window.location.origin + '/test');
-      testUrl.searchParams.set('data', encodeURIComponent(encryptedData));
-      
-      // Actualizar el enlace de compartir directamente
-      setShareLink(testUrl.toString());
-      
-      // Guardar los datos en localStorage para referencia futura
-      const tests = JSON.parse(localStorage.getItem('psychologistTests') || '{}');
-      tests[testId] = {
-        ...testData,
-        status: 'pending',
-        createdAt: new Date().toISOString()
-      };
-      localStorage.setItem('psychologistTests', JSON.stringify(tests));
-      
-    } catch (error) {
-      console.error('Error al generar el enlace:', error);
-      alert('Ocurrió un error al generar el enlace. Por favor, intente nuevamente.');
-    }
-  };
 
   const copyLinkToClipboard = async (text: string) => {
     if (!text) return;
@@ -221,9 +170,7 @@ const Home: React.FC = () => {
         title="Catálogo de Pruebas Psicológicas"
       />
       
-      <main className="container mx-auto px-4 py-8 md:py-12">
-        
-        
+      <main className="container mx-auto px-4 py-8 md:py-12">       
         <TestList 
           tests={tests} 
           onStartTest={handleStartTest} 

@@ -1,29 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { encryptData, decryptData, encryptTestResponses, generateHash } from '../../utils/crypto';
+import { encryptData, decryptData, generateHash } from '../../utils/crypto';
 import questions from './epqr-questions';
 import { CheckCircle, AlertCircle } from 'lucide-react';
-
-interface PatientData {
-  fullName: string;
-  age: number;
-  secretKey: string;
-  testType: string;
-  createdAt: string;
-}
-
-interface TestData {
-  encryptedPatientData: string;
-  testType: string;
-  createdAt: string;
-  status: string;
-}
 
 export default function SecurePatientTest() {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
   
-  const [patientData, setPatientData] = useState<PatientData | null>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<boolean[]>([]);
   const [testStage, setTestStage] = useState<'loading' | 'test' | 'submitting' | 'completed' | 'error'>('loading');
@@ -56,16 +40,6 @@ export default function SecurePatientTest() {
       if (!encryptedTestData) {
         throw new Error('Datos del test no encontrados en la URL');
       }
-
-      // El paciente no puede descifrar los datos porque no tiene la clave secreta
-      // Solo verificamos que los datos existen y mostramos el test
-      setPatientData({
-        fullName: 'Paciente', // Nombre genérico para mostrar
-        age: 0,
-        secretKey: '', // No disponible para el paciente
-        testType: 'EPQR',
-        createdAt: new Date().toISOString()
-      });
 
       // Inicializar respuestas
       setAnswers(Array(questions.length).fill(false));
