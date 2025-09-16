@@ -136,7 +136,6 @@ const Home: React.FC = () => {
 
   const handleStartTest = (testId: string) => {
     if (testId === '1') { // EPQR Test
-      // Redirigir al nuevo sistema seguro
       navigate('/psychologist/epqr');
     } else {
       setCurrentTestId(testId);
